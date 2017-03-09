@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "Charts";
+}
+<h2>@ViewBag.Title.</h2>
+@ViewBag.Data
+
+<script>
+    var dat = JSON.parse('@ViewBag.Data');
+    var title = @ViewBag.ChartTitle
+</script>
+<script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+          var data = google.visualization.arrayToDataTable(dat);
+        //var data = google.visualization.arrayToDataTable([
+        //  ['Task', 'Hours per Day'],
+        //  ['Work',     11],
+        //  ['Eat',      2],
+        //  ['Commute',  2],
+        //  ['Watch TV', 2],
+        //  ['Sleep',    7]
+        //]);
+
+        var options = {
+          title: '@ViewBag.ChartTitle'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+</script>
+<div id="piechart" style="width: 900px; height: 500px;"></div>

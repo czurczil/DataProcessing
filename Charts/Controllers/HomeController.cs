@@ -10,6 +10,9 @@ using System.Data;
 using NPOI.XSSF.UserModel;
 using System.Web.Script.Serialization;
 using System.Data.Entity.Migrations;
+using FastMember;
+using System.Collections;
+using Newtonsoft.Json;
 
 namespace Charts.Controllers
 {
@@ -18,7 +21,7 @@ namespace Charts.Controllers
         private ChartDBEntities db = new ChartDBEntities();
 
         [Serializable]
-        private class JSON_Values
+        public class JSON_Values
         {
             public int current_value;
             public int min_value;
@@ -123,10 +126,53 @@ namespace Charts.Controllers
             return View(dt);
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
+        //public List<JSON_Values> charts_values(List<Chart> data)
+        //{
+        //    List<JSON_Values> values = new List<JSON_Values>();
+        //    JavaScriptSerializer js = new JavaScriptSerializer();
+        //    foreach (var c in data)
+        //    {
+        //        values.Add(js.Deserialize<JSON_Values>(c.values));
+        //    }
+        //    return values;
+        //}
 
+        public ArrayList charts_values(List<Chart> data)
+        {
+            ArrayList all = new ArrayList();
+            List<JSON_Values> values = new List<JSON_Values>();
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            foreach (var c in data)
+            {
+                all.Add(new ArrayList { c.OutletID, c.KPI, js.Deserialize<JSON_Values>(c.values) });
+            }
+            return all;
+        }
+
+
+        public ActionResult Charts()
+        {
+
+            //ArrayList header = new ArrayList { "Current value", "value" };
+            //ArrayList data1 = new ArrayList { "OutletID 1", 30 };
+            //ArrayList data2 = new ArrayList { "OutletID 2", 146 };
+            //ArrayList data3 = new ArrayList { "OutletID 3", 13 };
+            //ArrayList data = new ArrayList { header, data1, data2, data3 };
+
+            //var sdata = JsonConvert.SerializeObject(data, Formatting.None);
+            //ViewBag.Data1 = new HtmlString(sdata);
+
+            var dat = db.Charts.ToList();
+            var data = charts_values(dat);
+            ViewBag.ChartTitle = "KPI";
+            ArrayList d = new ArrayList { new ArrayList { "Current value", "value" } };
+            foreach(var c in data)
+            {
+                d.Add(new ArrayList { });
+                foreach()
+            }
+            var sdata = JsonConvert.SerializeObject(d, Formatting.None);
+            ViewBag.Data = new HtmlString(sdata);
             return View();
         }
 

@@ -1,0 +1,53 @@
+﻿@model System.Data.DataTable
+@{
+    ViewBag.Title = "Home Page";
+}
+<br>
+@if (ViewBag.Error != null)
+{
+    <label>@ViewBag.Error</label>
+}
+
+@using (Html.BeginForm("Index", "Home", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="form-group">
+        @Html.Label("Wybierz arkusz Excel", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <input id="excel" type="file" name="excel" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Zapisz do bazy" class="btn btn-default" />
+        </div>
+    </div>
+
+    <br>
+
+    if (Model != null)
+    {
+        <table border="1">
+            <thead>
+                <tr>
+                    @foreach (System.Data.DataColumn col in Model.Columns)
+                    {
+                        <th>@col.Caption</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (System.Data.DataRow row in Model.Rows)
+                {
+                    <tr>
+                        @foreach (var cell in row.ItemArray)
+                        {
+                            <td>@cell.ToString()</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+}

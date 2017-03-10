@@ -148,9 +148,10 @@ namespace Charts.Controllers
         public ActionResult Charts()
         {
             var dat = db.Charts.ToList();
+
             PieChart(dat);
 
-            BarChart(dat);
+            BarChart(dat,2);
 
             return View();
         }
@@ -165,28 +166,45 @@ namespace Charts.Controllers
         public void PieChart(List<Chart> dat)
         {
             var data = charts_values(dat);
-            ArrayList d = new ArrayList { new ArrayList { "OutledID", "current value" } };
+
+
             ViewBag.PieTitle = data[0].KPI;
+
+
+            ArrayList d = new ArrayList { new ArrayList { "OutledID", "current value" } };
             foreach (var x in data)
             {
                 d.Add(new ArrayList { "OutledID " + x.OutledID, x.values.current_value });
             }
+
+
             var sdata = JsonConvert.SerializeObject(d, Formatting.None);
             ViewBag.PieData = new HtmlString(sdata);
         }
 
-        public void BarChart(List<Chart> dat)
+        public void BarChart(List<Chart> dat, int i)
         {
             var data = charts_values(dat);
+
+
+            string range = "[" + data[i].values.min_value + ", ";
+            for(int x = 0; x < data[i].values.thresholds.Count; x++)
+            {
+                range = range + data[i].values.thresholds[x] + ", ";
+            }
+            range = range + data[i].values.max_value + "]";
+
+
+
+            ViewBag.Min = data[i].values.min_value;
+            ViewBag.Max = data[i].values.max_value;
+            ViewBag.Range = range;
+            ViewBag.BarTitle = data[i].KPI;
+
+
             ArrayList d = new ArrayList { new ArrayList { "OutledID", "current value" } };
-
-            ViewBag.DataCount = data.Count;
-
-            ViewBag.Min = data[2].values.min_value;
-            ViewBag.Max = data[2].values.max_value;
-            ViewBag.BarTitle = data[2].KPI;
-            d.Add(new ArrayList { "OutledID " + data[2].OutledID, data[2].values.current_value });
-
+            d.Add(new ArrayList { "OutledID " + data[i].OutledID, data[i].values.current_value });
+  
             var sdata = JsonConvert.SerializeObject(d, Formatting.None);
             ViewBag.BarData = new HtmlString(sdata);
         }

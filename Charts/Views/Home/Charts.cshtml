@@ -4,7 +4,6 @@
 <h2>@ViewBag.Title.</h2>
 
 <script type="text/javascript">
-    //google.charts.load('current', {'packages':['corechart']});
     google.charts.load('current', {'packages': ['corechart','bar']});
     
       google.charts.setOnLoadCallback(drawPieChart);
@@ -25,26 +24,25 @@
       }
 
     function drawBarChart() {
-        
+
         var data = google.visualization.arrayToDataTable(@ViewBag.BarData);
 
         var barchart_options = {
+            isStacked: true,
             title: '@ViewBag.BarTitle',
             width: 900,
             height: 150,
             legend: 'none',
             bars: 'horizontal',
             hAxis: {
-                viewWindow: {
-                    min: @ViewBag.Min,
-                    max: @ViewBag.Max
-                }
+                viewWindow: {min: @ViewBag.Min , max: @ViewBag.Max},
+                ticks: @ViewBag.Range
             }
         };
 
-        var barchart = new google.charts.Bar(document.getElementById('barchart'));
+        var barchart = new google.visualization.BarChart(document.getElementById('barchart'));
 
-        barchart.draw(data, google.charts.Bar.convertOptions(barchart_options));
+        barchart.draw(data, barchart_options);
     }
 </script>
 <div id="piechart"></div>

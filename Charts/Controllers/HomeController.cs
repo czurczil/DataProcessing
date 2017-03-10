@@ -20,6 +20,13 @@ namespace Charts.Controllers
     {
         private ChartDBEntities db = new ChartDBEntities();
 
+        public class Data
+        {
+            public int OutledID;
+            public string KPI;
+            public JSON_Values values;
+        }
+
         [Serializable]
         public class JSON_Values
         {
@@ -126,29 +133,17 @@ namespace Charts.Controllers
             return View(dt);
         }
 
-        //public List<JSON_Values> charts_values(List<Chart> data)
-        //{
-        //    List<JSON_Values> values = new List<JSON_Values>();
-        //    JavaScriptSerializer js = new JavaScriptSerializer();
-        //    foreach (var c in data)
-        //    {
-        //        values.Add(js.Deserialize<JSON_Values>(c.values));
-        //    }
-        //    return values;
-        //}
-
-        public ArrayList charts_values(List<Chart> data)
+        public List<List<Data>> charts_values(List<Chart> data)
         {
-            ArrayList all = new ArrayList();
+            List<List<Data>> list = new List<List<Data>>();
             List<JSON_Values> values = new List<JSON_Values>();
             JavaScriptSerializer js = new JavaScriptSerializer();
-            foreach (var c in data)
+            foreach(var c in data)
             {
-                all.Add(new ArrayList { c.OutletID, c.KPI, js.Deserialize<JSON_Values>(c.values) });
+                list.Add(new List<Data>() { new Controllers.HomeController.Data() { OutledID = c.OutletID, KPI = c.KPI, values = js.Deserialize<JSON_Values>(c.values) } });
             }
-            return all;
+            return list;
         }
-
 
         public ActionResult Charts()
         {
@@ -161,18 +156,10 @@ namespace Charts.Controllers
 
             //var sdata = JsonConvert.SerializeObject(data, Formatting.None);
             //ViewBag.Data1 = new HtmlString(sdata);
-
             var dat = db.Charts.ToList();
-            var data = charts_values(dat);
-            ViewBag.ChartTitle = "KPI";
-            ArrayList d = new ArrayList { new ArrayList { "Current value", "value" } };
-            foreach(var c in data)
-            {
-                d.Add(new ArrayList { });
-                foreach()
-            }
-            var sdata = JsonConvert.SerializeObject(d, Formatting.None);
-            ViewBag.Data = new HtmlString(sdata);
+            PieChart(dat);
+            //BarChart(dat);
+
             return View();
         }
 
@@ -181,6 +168,29 @@ namespace Charts.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        public void PieChart(List<Chart> dat)
+        {
+            var data = charts_values(dat);
+            ArrayList d = new ArrayList { new ArrayList { "OutledID", "current value" } };
+            foreach (var x in data)
+            {
+                foreach (var y in x)
+                {
+                    ViewBag.PieTitle = y.KPI;
+                    d.Add(new ArrayList { "OutledID " + y.OutledID, y.values.current_value });
+                }
+            }
+            var sdata = JsonConvert.SerializeObject(d, Formatting.None);
+            ViewBag.PieData = new HtmlString(sdata);
+        }
+
+        public void BarChart(List<Chart> dat)
+        {
+            var data = charts_values(dat);
+            ArrayList d = new ArrayList { new ArrayList { "OutledID", "current value" } };
+
         }
     }
 }

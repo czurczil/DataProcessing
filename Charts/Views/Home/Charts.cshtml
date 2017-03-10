@@ -2,18 +2,15 @@
     ViewBag.Title = "Charts";
 }
 <h2>@ViewBag.Title.</h2>
+
 @ViewBag.Data
 
-<script>
-    var dat = JSON.parse('@ViewBag.Data');
-    var title = @ViewBag.ChartTitle
-</script>
 <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
-          var data = google.visualization.arrayToDataTable(dat);
+          var data = google.visualization.arrayToDataTable(@ViewBag.PieData);
         //var data = google.visualization.arrayToDataTable([
         //  ['Task', 'Hours per Day'],
         //  ['Work',     11],
@@ -23,13 +20,27 @@
         //  ['Sleep',    7]
         //]);
 
-        var options = {
-          title: '@ViewBag.ChartTitle'
+        var piechart_options = {
+            title: '@ViewBag.PieTitle',
+            width: 900,
+            height: 500
         };
+        var piechart = new google.visualization.PieChart(document.getElementById('piechart'));
 
-        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+          piechart.draw(data, piechart_options);
 
-        chart.draw(data, options);
+          var barchart_options = {
+              title: '@ViewBag.PieTitle',
+              width: 900,
+              height: 500,
+              legend: 'none'
+          };
+          var barchart = new google.visualization.BarChart(document.getElementById('barchart'));
+
+          barchart.draw(data, barchart_options);
+
+
       }
 </script>
-<div id="piechart" style="width: 900px; height: 500px;"></div>
+<div id="piechart"></div>
+<div id="barchart"></div>

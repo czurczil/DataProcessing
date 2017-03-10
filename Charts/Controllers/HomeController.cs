@@ -80,7 +80,7 @@ namespace Charts.Controllers
                     {
                         dr[x] = row.GetCell(j).ToString();
                         x++;
-                    } 
+                    }
                 }
                 if (i == sheet.FirstRowNum) continue;
                 dt.Rows.Add(dr);
@@ -118,14 +118,14 @@ namespace Charts.Controllers
                     db.Charts.AddOrUpdate(chart);
                     db.SaveChanges();
                 }
-                catch(NullReferenceException ex)
+                catch (NullReferenceException ex)
                 {
                     ViewBag.Error = ex.Message + " Nie zapisano, uzupełnij brakujące dane:";
                 }
             }
             db.Dispose();
 
-            if(System.IO.File.Exists(fullpath))
+            if (System.IO.File.Exists(fullpath))
             {
                 System.IO.File.Delete(fullpath);
             }
@@ -133,32 +133,24 @@ namespace Charts.Controllers
             return View(dt);
         }
 
-        public List<List<Data>> charts_values(List<Chart> data)
+        public List<Data> charts_values(List<Chart> data)
         {
-            List<List<Data>> list = new List<List<Data>>();
+            List<Data> list = new List<Data>();
             List<JSON_Values> values = new List<JSON_Values>();
             JavaScriptSerializer js = new JavaScriptSerializer();
-            foreach(var c in data)
+            foreach (var c in data)
             {
-                list.Add(new List<Data>() { new Controllers.HomeController.Data() { OutledID = c.OutletID, KPI = c.KPI, values = js.Deserialize<JSON_Values>(c.values) } });
+                list.Add(new Controllers.HomeController.Data() { OutledID = c.OutletID, KPI = c.KPI, values = js.Deserialize<JSON_Values>(c.values) });
             }
             return list;
         }
 
         public ActionResult Charts()
         {
-
-            //ArrayList header = new ArrayList { "Current value", "value" };
-            //ArrayList data1 = new ArrayList { "OutletID 1", 30 };
-            //ArrayList data2 = new ArrayList { "OutletID 2", 146 };
-            //ArrayList data3 = new ArrayList { "OutletID 3", 13 };
-            //ArrayList data = new ArrayList { header, data1, data2, data3 };
-
-            //var sdata = JsonConvert.SerializeObject(data, Formatting.None);
-            //ViewBag.Data1 = new HtmlString(sdata);
             var dat = db.Charts.ToList();
             PieChart(dat);
-            //BarChart(dat);
+
+            BarChart(dat);
 
             return View();
         }
@@ -174,13 +166,10 @@ namespace Charts.Controllers
         {
             var data = charts_values(dat);
             ArrayList d = new ArrayList { new ArrayList { "OutledID", "current value" } };
+            ViewBag.PieTitle = data[0].KPI;
             foreach (var x in data)
             {
-                foreach (var y in x)
-                {
-                    ViewBag.PieTitle = y.KPI;
-                    d.Add(new ArrayList { "OutledID " + y.OutledID, y.values.current_value });
-                }
+                d.Add(new ArrayList { "OutledID " + x.OutledID, x.values.current_value });
             }
             var sdata = JsonConvert.SerializeObject(d, Formatting.None);
             ViewBag.PieData = new HtmlString(sdata);
@@ -191,6 +180,15 @@ namespace Charts.Controllers
             var data = charts_values(dat);
             ArrayList d = new ArrayList { new ArrayList { "OutledID", "current value" } };
 
+            ViewBag.DataCount = data.Count;
+
+            ViewBag.Min = data[2].values.min_value;
+            ViewBag.Max = data[2].values.max_value;
+            ViewBag.BarTitle = data[2].KPI;
+            d.Add(new ArrayList { "OutledID " + data[2].OutledID, data[2].values.current_value });
+
+            var sdata = JsonConvert.SerializeObject(d, Formatting.None);
+            ViewBag.BarData = new HtmlString(sdata);
         }
     }
 }

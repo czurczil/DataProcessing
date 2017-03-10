@@ -3,22 +3,16 @@
 }
 <h2>@ViewBag.Title.</h2>
 
-@ViewBag.Data
-
 <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
+    //google.charts.load('current', {'packages':['corechart']});
+    google.charts.load('current', {'packages': ['corechart','bar']});
+    
+      google.charts.setOnLoadCallback(drawPieChart);
+      google.charts.setOnLoadCallback(drawBarChart);
 
-      function drawChart() {
+      function drawPieChart() {
+
           var data = google.visualization.arrayToDataTable(@ViewBag.PieData);
-        //var data = google.visualization.arrayToDataTable([
-        //  ['Task', 'Hours per Day'],
-        //  ['Work',     11],
-        //  ['Eat',      2],
-        //  ['Commute',  2],
-        //  ['Watch TV', 2],
-        //  ['Sleep',    7]
-        //]);
 
         var piechart_options = {
             title: '@ViewBag.PieTitle',
@@ -28,19 +22,30 @@
         var piechart = new google.visualization.PieChart(document.getElementById('piechart'));
 
           piechart.draw(data, piechart_options);
-
-          var barchart_options = {
-              title: '@ViewBag.PieTitle',
-              width: 900,
-              height: 500,
-              legend: 'none'
-          };
-          var barchart = new google.visualization.BarChart(document.getElementById('barchart'));
-
-          barchart.draw(data, barchart_options);
-
-
       }
+
+    function drawBarChart() {
+        
+        var data = google.visualization.arrayToDataTable(@ViewBag.BarData);
+
+        var barchart_options = {
+            title: '@ViewBag.BarTitle',
+            width: 900,
+            height: 150,
+            legend: 'none',
+            bars: 'horizontal',
+            hAxis: {
+                viewWindow: {
+                    min: @ViewBag.Min,
+                    max: @ViewBag.Max
+                }
+            }
+        };
+
+        var barchart = new google.charts.Bar(document.getElementById('barchart'));
+
+        barchart.draw(data, google.charts.Bar.convertOptions(barchart_options));
+    }
 </script>
 <div id="piechart"></div>
 <div id="barchart"></div>

@@ -7,7 +7,6 @@
     google.charts.load('current', {'packages': ['corechart','bar']});
     
       google.charts.setOnLoadCallback(drawPieChart);
-      google.charts.setOnLoadCallback(drawBarChart);
 
       function drawPieChart() {
 
@@ -22,28 +21,48 @@
 
           piechart.draw(data, piechart_options);
       }
+    
+    google.charts.setOnLoadCallback(function() {
+        for(var i = 0; i < @ViewBag.Count; i++)
+        {
+            var data = @ViewBag.BarData;
+            var title = @ViewBag.BarTitles;
+            var min_max = @ViewBag.MinMax;
+            var ranges = @ViewBag.Ranges;
+            drawBarChart(i, data[i], ranges[i], title[i], min_max[i] );
+        }
+        });
 
-    function drawBarChart() {
 
-        var data = google.visualization.arrayToDataTable(@ViewBag.BarData);
+    function drawBarChart(i, dat, range, title, min_max) {
+        var data = new google.visualization.DataTable();
+            data.addColumn('string', 'OutledID');
+            data.addColumn('number', 'Values');
+            data.addRows([dat]);
 
-        var barchart_options = {
-            isStacked: true,
-            title: '@ViewBag.BarTitle',
-            width: 900,
-            height: 150,
-            legend: 'none',
-            bars: 'horizontal',
-            hAxis: {
-                viewWindow: {min: @ViewBag.Min , max: @ViewBag.Max},
-                ticks: @ViewBag.Range
-            }
-        };
+            var barchart_options = {
+                isStacked: true,
+                title: title,
+                width: 900,
+                height: 150,
+                legend: 'none',
+                bars: 'horizontal',
+                hAxis: {
+                    viewWindow: {min: min_max[0] , max: min_max[1]},
+                    ticks: range
+                }
+            };
+            var id = "barchart" + i;
+            var barchart = new google.visualization.BarChart(document.getElementById(id));
 
-        var barchart = new google.visualization.BarChart(document.getElementById('barchart'));
+            barchart.draw(data, barchart_options);
+        }
 
-        barchart.draw(data, barchart_options);
-    }
+
 </script>
 <div id="piechart"></div>
-<div id="barchart"></div>
+@for (int i = 0; i < ViewBag.Count; i++)
+{
+    <div id="@string.Format("barchart{0}",i)"></div>
+}
+

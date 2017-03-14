@@ -151,7 +151,7 @@ namespace Charts.Controllers
 
             PieChart(dat);
 
-            BarChart(dat,2);
+            BarChart(dat);
 
             return View();
         }
@@ -182,31 +182,44 @@ namespace Charts.Controllers
             ViewBag.PieData = new HtmlString(sdata);
         }
 
-        public void BarChart(List<Chart> dat, int i)
+        public void BarChart(List<Chart> dat)
         {
             var data = charts_values(dat);
 
+            ArrayList titles = new ArrayList();
+            ArrayList ranges = new ArrayList();
+            ArrayList min_max = new ArrayList();
+            ViewBag.Count = dat.Count;
 
-            string range = "[" + data[i].values.min_value + ", ";
-            for(int x = 0; x < data[i].values.thresholds.Count; x++)
+            ArrayList d = new ArrayList();
+            for(int i = 0; i < dat.Count; i++)
             {
-                range = range + data[i].values.thresholds[x] + ", ";
+                var rang = data[i].values.thresholds;
+                rang.Insert(0, data[i].values.min_value);
+                rang.Insert(0, data[i].values.max_value);
+                rang.Sort();
+                ranges.AddRange(new ArrayList() { rang });
+
+
+
+                titles.Add(data[i].KPI);
+
+                min_max.Add(new ArrayList() { data[i].values.min_value, data[i].values.max_value });
+
+                d.Add(new ArrayList { "OutledID " + data[i].OutledID, data[i].values.current_value });
             }
-            range = range + data[i].values.max_value + "]";
-
-
-
-            ViewBag.Min = data[i].values.min_value;
-            ViewBag.Max = data[i].values.max_value;
-            ViewBag.Range = range;
-            ViewBag.BarTitle = data[i].KPI;
-
-
-            ArrayList d = new ArrayList { new ArrayList { "OutledID", "current value" } };
-            d.Add(new ArrayList { "OutledID " + data[i].OutledID, data[i].values.current_value });
   
             var sdata = JsonConvert.SerializeObject(d, Formatting.None);
             ViewBag.BarData = new HtmlString(sdata);
+
+            var stitles = JsonConvert.SerializeObject(titles, Formatting.None);
+            ViewBag.BarTitles = new HtmlString(stitles);
+
+            var sranges= JsonConvert.SerializeObject(ranges, Formatting.None);
+            ViewBag.Ranges = sranges;
+
+            var smin_max = JsonConvert.SerializeObject(min_max, Formatting.None);
+            ViewBag.MinMax = smin_max;
         }
     }
 }

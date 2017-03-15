@@ -35,18 +35,17 @@
 
 
     function drawBarChart(i, dat, range, title, min_max) {
+
         var data = new google.visualization.DataTable();
             data.addColumn('string', 'OutledID');
-            data.addColumn('number', 'Values');
+            data.addColumn('number', 'Current value');
             data.addRows([dat]);
 
             var barchart_options = {
-                isStacked: true,
                 title: title,
                 width: 900,
                 height: 150,
                 legend: 'none',
-                bars: 'horizontal',
                 hAxis: {
                     viewWindow: {min: min_max[0] , max: min_max[1]},
                     ticks: range

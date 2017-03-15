@@ -125,6 +125,7 @@ namespace Charts.Controllers
             }
             db.Dispose();
 
+            //delete file from server
             if (System.IO.File.Exists(fullpath))
             {
                 System.IO.File.Delete(fullpath);
@@ -194,21 +195,24 @@ namespace Charts.Controllers
             ArrayList d = new ArrayList();
             for(int i = 0; i < dat.Count; i++)
             {
+                //adding thresholds with min and max value
                 var rang = data[i].values.thresholds;
-                rang.Insert(0, data[i].values.min_value);
-                rang.Insert(0, data[i].values.max_value);
+                if(!rang.Contains(data[i].values.min_value)) rang.Insert(0, data[i].values.min_value);
+                if(!rang.Contains(data[i].values.max_value)) rang.Insert(0, data[i].values.max_value);
                 rang.Sort();
                 ranges.AddRange(new ArrayList() { rang });
 
-
-
+                //adding chart titles                                                                           // every index of all of arrays contains data for one chart
                 titles.Add(data[i].KPI);
 
+                //adding min and max values
                 min_max.Add(new ArrayList() { data[i].values.min_value, data[i].values.max_value });
 
+                //adding ids 
                 d.Add(new ArrayList { "OutledID " + data[i].OutledID, data[i].values.current_value });
             }
   
+            //converting datas to json 
             var sdata = JsonConvert.SerializeObject(d, Formatting.None);
             ViewBag.BarData = new HtmlString(sdata);
 
